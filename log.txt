@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "/home/gcl/Desktop/GCL/Projects/Cannon/insta-auto/ai.py", line 20, in auto_post
+    photos = [f for f in os.listdir(post_folder) if f.lower().endswith((".jpg", ".jpeg", ".png"))]
+                         ^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'posts'
+❌ An error occurred during auto posting:
+Error details: [Errno 2] No such file or directory: 'posts'
+✅ Post uploaded successfully.
+📝 Caption used:
+I'm not antisocial
+
+Daily post - 2025-07-29 #funnytweets #fyp #foryoupage #viral #trending #explorepage
+✅ Post uploaded successfully.
+📝 Caption used:
+I don’t have insomnia
+
+Daily post - 2025-07-29 #justforfun #dankmemes #funnyvideos #funnyposts #meme #funnytweets
