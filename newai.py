@@ -139,4 +139,4 @@ def auto_post(username: str, password: str,
         print(f"Error details: {str(e)}")
 
 if __name__ == "__main__":
-    auto_post("gcme.mes2025", "Lukoonge14@")
+    auto_post("gcme.mes2025", "PASSWORD")
