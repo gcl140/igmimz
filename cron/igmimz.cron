@@ -1,0 +1,9 @@
+# igmimz - daily auto-post at 08:00 server time
+# Install with:  crontab -e   then paste the line below (fix the path first),
+# or:            crontab cron/igmimz.cron   (after fixing the path)
+#
+# Check the server's timezone with `timedatectl` before relying on 8am
+# actually meaning 8am local time - cron uses the system clock/timezone.
+#
+# minute hour day month weekday   command
+0 8 * * * /home/youruser/igmimz/run.sh
