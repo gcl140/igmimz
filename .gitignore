@@ -163,8 +163,10 @@ cython_debug/
 session.json
 qsession.json
 state.db
-posts/*
-!posts/.gitkeep
+posts/photos/*
+!posts/photos/.gitkeep
+posts/videos/*
+!posts/videos/.gitkeep
 converted/
 logs/*.log
 .DS_Store

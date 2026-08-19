@@ -18,6 +18,8 @@ IG_USERNAME = os.getenv("IG_USERNAME")
 IG_PASSWORD = os.getenv("IG_PASSWORD")
 SESSION_FILE = os.getenv("SESSION_FILE", os.path.join(BASE_DIR, "session.json"))
 POST_FOLDER = os.getenv("POST_FOLDER", os.path.join(BASE_DIR, "posts"))
+PHOTOS_FOLDER = os.getenv("PHOTOS_FOLDER", os.path.join(POST_FOLDER, "photos"))
+VIDEOS_FOLDER = os.getenv("VIDEOS_FOLDER", os.path.join(POST_FOLDER, "videos"))
 CAPTION_CSV = os.getenv("CAPTION_CSV", os.path.join(BASE_DIR, "captions.csv"))
 STATE_DB = os.getenv("STATE_DB", os.path.join(BASE_DIR, "state.db"))
 CONVERTED_FOLDER = os.getenv("CONVERTED_FOLDER", os.path.join(BASE_DIR, "converted"))
@@ -134,7 +136,8 @@ def build_caption(base_caption):
 
 
 def auto_post(username, password, session_file=SESSION_FILE,
-              post_folder=POST_FOLDER, caption_csv=CAPTION_CSV, state_db=STATE_DB):
+              photos_folder=PHOTOS_FOLDER, videos_folder=VIDEOS_FOLDER,
+              caption_csv=CAPTION_CSV, state_db=STATE_DB):
 
     if not username or not password:
         raise ValueError("IG_USERNAME / IG_PASSWORD are not set (check your .env file).")
@@ -156,12 +159,13 @@ def auto_post(username, password, session_file=SESSION_FILE,
             cl.login(username, password)
             cl.dump_settings(session_file)
 
-        os.makedirs(post_folder, exist_ok=True)
-        photos = [f for f in os.listdir(post_folder) if f.lower().endswith((".jpg", ".jpeg", ".png"))]
-        videos = [f for f in os.listdir(post_folder) if f.lower().endswith((".mp4", ".mov"))]
+        os.makedirs(photos_folder, exist_ok=True)
+        os.makedirs(videos_folder, exist_ok=True)
+        photos = [f for f in os.listdir(photos_folder) if f.lower().endswith((".jpg", ".jpeg", ".png"))]
+        videos = [f for f in os.listdir(videos_folder) if f.lower().endswith((".mp4", ".mov"))]
 
         if not photos and not videos:
-            raise FileNotFoundError("No photos or videos found in the posts folder.")
+            raise FileNotFoundError("No photos or videos found in posts/photos or posts/videos.")
 
         chosen_photo = pick_unused(conn, "used_media", "filename", photos, "photos")
         chosen_video = pick_unused(conn, "used_media", "filename", videos, "videos")
@@ -172,7 +176,7 @@ def auto_post(username, password, session_file=SESSION_FILE,
         full_caption = build_caption(base_caption)
 
         if chosen_photo:
-            photo_path = os.path.join(post_folder, chosen_photo)
+            photo_path = os.path.join(photos_folder, chosen_photo)
             try:
                 validated_photo = validate_media(photo_path)
                 cl.photo_upload(validated_photo, full_caption)
@@ -184,7 +188,7 @@ def auto_post(username, password, session_file=SESSION_FILE,
                 traceback.print_exc()
 
         if chosen_video:
-            video_path = os.path.join(post_folder, chosen_video)
+            video_path = os.path.join(videos_folder, chosen_video)
             try:
                 validated_video = validate_media(video_path)
                 # Generate the thumbnail into CONVERTED_FOLDER ourselves - if left to
