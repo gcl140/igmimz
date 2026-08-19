@@ -2,12 +2,13 @@ import os
 import csv
 import random
 import sqlite3
+import subprocess
 import traceback
 from datetime import datetime
 
+import imageio_ffmpeg
 from dotenv import load_dotenv
 from instagrapi import Client
-from instagrapi.utils.video import generate_video_thumbnail
 from PIL import Image
 
 load_dotenv()
@@ -73,6 +74,16 @@ def pick_unused(conn, table, key_col, pool, label):
         available = pool
 
     return random.choice(available)
+
+
+def generate_thumbnail(video_path, thumbnail_path, at_seconds=0.5):
+    """Grab a single frame from the video as a JPEG thumbnail via ffmpeg."""
+    ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+    subprocess.run(
+        [ffmpeg_exe, "-y", "-ss", str(at_seconds), "-i", str(video_path),
+         "-frames:v", "1", "-q:v", "3", str(thumbnail_path)],
+        check=True, capture_output=True,
+    )
 
 
 def convert_to_jpeg(input_path, output_folder=CONVERTED_FOLDER):
@@ -198,7 +209,7 @@ def auto_post(username, password, session_file=SESSION_FILE,
                 thumbnail_path = os.path.join(
                     CONVERTED_FOLDER, os.path.basename(chosen_video) + ".jpg"
                 )
-                generate_video_thumbnail(validated_video, thumbnail_path)
+                generate_thumbnail(validated_video, thumbnail_path)
                 cl.clip_upload(validated_video, full_caption, thumbnail=thumbnail_path)
                 mark_used(conn, "used_media", "filename", chosen_video)
                 print("Video uploaded successfully.")
