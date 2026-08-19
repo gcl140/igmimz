@@ -167,3 +167,4 @@ posts/*
 !posts/.gitkeep
 converted/
 logs/*.log
+.DS_Store

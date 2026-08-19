@@ -7,6 +7,7 @@ from datetime import datetime
 
 from dotenv import load_dotenv
 from instagrapi import Client
+from instagrapi.utils.video import generate_video_thumbnail
 from PIL import Image
 
 load_dotenv()
@@ -186,7 +187,15 @@ def auto_post(username, password, session_file=SESSION_FILE,
             video_path = os.path.join(post_folder, chosen_video)
             try:
                 validated_video = validate_media(video_path)
-                cl.clip_upload(validated_video, full_caption)
+                # Generate the thumbnail into CONVERTED_FOLDER ourselves - if left to
+                # clip_upload's default, it drops a .jpg next to the video inside
+                # post_folder, which then gets mistaken for a photo on the next run.
+                os.makedirs(CONVERTED_FOLDER, exist_ok=True)
+                thumbnail_path = os.path.join(
+                    CONVERTED_FOLDER, os.path.basename(chosen_video) + ".jpg"
+                )
+                generate_video_thumbnail(validated_video, thumbnail_path)
+                cl.clip_upload(validated_video, full_caption, thumbnail=thumbnail_path)
                 mark_used(conn, "used_media", "filename", chosen_video)
                 print("Video uploaded successfully.")
                 print(f"Caption used:\n{full_caption}")
